@@ -98,25 +98,37 @@ export const View = {
         <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
             ${scoreHtml}
         </div>
-        <div class="card"><h3>${escapeHTML(q.text)}</h3></div>
+       <div class="card"><h3>${escapeHTML(q.text)}</h3></div>
         <div id="answers-container">${answersHtml}</div>
+        
+        <div style="display:flex; align-items:center; margin-top: 15px; margin-bottom: 5px; padding: 12px; background: rgba(243, 156, 18, 0.1); border-radius: 8px; border: 1px dashed #f39c12;">
+            <input type="checkbox" id="guessed-check" style="transform: scale(1.5); margin-right: 15px; cursor: pointer; accent-color: #f39c12;">
+            <label for="guessed-check" style="cursor: pointer; font-weight: bold; color: #d68910;">Nie byłem pewny (Strzelałem 🎯)</label>
+        </div>
+
         <button id="submit-answer-btn" class="btn" style="background:#2ecc71; margin-top:20px" onclick="window.app.handleAnswer()" disabled>Zatwierdź odpowiedź</button>
         `;
     },
 
-    results(quizSession) {
+results(quizSession) {
         const total = quizSession.questions.length;
         const percent = Math.round((quizSession.score / total) * 100);
         
-        // Zamiast filtrować błędy, bierzemy całą historię
         let resultsHtml = '';
 
-        quizSession.history.forEach(({ isCorrect, userSelected, question }, index) => {
+        quizSession.history.forEach(({ isCorrect, userSelected, question, isGuessed }, index) => {
             
-            // Stylizacja kart w zależności od poprawności
-            const borderColor = isCorrect ? '#2ecc71' : '#dc3545'; // zielony lub czerwony
+            const borderColor = isCorrect ? '#2ecc71' : '#dc3545';
             const resultClass = isCorrect ? 'result-correct-card' : 'result-wrong-card';
             const icon = isCorrect ? '✅' : '❌';
+
+            // Zmienna generująca plakietkę
+            const guessedBadge = isGuessed 
+                ? `<span style="background: #f39c12; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 10px; vertical-align: middle;">🎯 Strzał</span>` 
+                : '';
+
+            // NOWE: Klasa pomocnicza do ukrywania/pokazywania tylko strzałów
+            const guessedClass = isGuessed ? 'result-guessed-card' : 'result-not-guessed-card';
 
             const userAnsList = userSelected
                 .map(i => `<li style="margin-left: 15px;">• ${escapeHTML(question.answers[i])}</li>`)
@@ -133,9 +145,9 @@ export const View = {
             const correctAnsDisplay = `<ul style="list-style: none; padding: 0; margin: 5px 0; color: #2ecc71;">${correctAnsList}</ul>`;
             
             resultsHtml += `
-            <div class="card ${resultClass}" style="border-left: 5px solid ${borderColor}; position:relative;">
+            <div class="card ${resultClass} ${guessedClass}" style="border-left: 5px solid ${borderColor}; position:relative;">
                 <div style="position:absolute; right:10px; top:10px; font-size:1.2em;">${icon}</div>
-                <p style="margin-right:25px"><strong>${index + 1}. ${escapeHTML(question.text)}</strong></p>
+                <p style="margin-right:25px"><strong>${index + 1}. ${escapeHTML(question.text)}</strong> ${guessedBadge}</p>
                 
                 <div style="margin-bottom: 10px;">
                     <p style="font-size:0.9em; opacity:0.8; margin-bottom: 2px;">Twoje odpowiedzi:</p>
@@ -149,10 +161,11 @@ export const View = {
             </div>`;
         });
 
-        // Styl CSS do ukrywania poprawnych odpowiedzi
+        // AKTUALIZACJA: Reguły CSS dla obu filtrów
         const styleBlock = `
         <style>
             .hide-correct .result-correct-card { display: none; }
+            .show-only-guessed .card:not(.result-guessed-card) { display: none; }
         </style>`;
 
         return `
@@ -162,9 +175,12 @@ export const View = {
             Poprawne: ${quizSession.score} / ${total}
         </div>
         
-        <div style="margin-bottom: 15px;">
-            <button id="toggle-results-btn" class="btn" style="background:#f1c40f; color:#333; width:100%" onclick="window.app.toggleResultsView()">
+        <div style="display:flex; gap:10px; margin-bottom: 15px;">
+            <button id="toggle-results-btn" class="btn" style="background:#f1c40f; color:#333; margin:0; flex:1;" onclick="window.app.toggleResultsView()">
                 Ukryj poprawne odpowiedzi
+            </button>
+            <button id="toggle-guessed-btn" class="btn" style="background:#e67e22; color:white; margin:0; flex:1;" onclick="window.app.toggleGuessedOnlyView()">
+                Pokaż tylko strzały
             </button>
         </div>
 

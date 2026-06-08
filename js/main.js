@@ -295,7 +295,7 @@ const Controller = {
     },
 
     // NOWA FUNKCJA DO OBSŁUGI PRZYCISKU WYNIKÓW
-    toggleResultsView: () => {
+ toggleResultsView: () => {
         const list = document.getElementById('results-list');
         const btn = document.getElementById('toggle-results-btn');
         
@@ -324,7 +324,22 @@ const Controller = {
         }
     },
 
-    handleAnswer: () => {
+    toggleGuessedOnlyView: () => {
+        const list = document.getElementById('results-list');
+        const btn = document.getElementById('toggle-guessed-btn');
+        
+        if (list.classList.contains('show-only-guessed')) {
+            list.classList.remove('show-only-guessed');
+            btn.textContent = "Pokaż tylko strzały";
+            btn.style.background = "#e67e22"; // pomarańczowy
+        } else {
+            list.classList.add('show-only-guessed');
+            btn.textContent = "Pokaż wszystkie pytania";
+            btn.style.background = "#3498db"; // niebieski
+        }
+    },
+
+handleAnswer: () => {
         const submitBtn = document.getElementById('submit-answer-btn');
         if (!submitBtn || submitBtn.disabled) return;
 
@@ -336,10 +351,16 @@ const Controller = {
 
         submitBtn.disabled = true;
 
-        const isCorrect = currentSession.submitAnswer(selected);
+        // ODCZYT ZE STRONY:
+        const guessedCheck = document.getElementById('guessed-check');
+        const isGuessed = guessedCheck ? guessedCheck.checked : false;
+
+        // TUTAJ MUSI BYĆ DODANE ", isGuessed":
+        const isCorrect = currentSession.submitAnswer(selected, isGuessed);
         const q = currentSession.getCurrentQuestion();
 
-        if (isCorrect) markAsMastered(currentSession.subjectId, q.id);
+        // Nie dodajemy do opanowanych, jeśli był to strzał:
+        if (isCorrect && !isGuessed) markAsMastered(currentSession.subjectId, q.id);
 
         const isExamMode = typeof currentSession.mode === 'number';
 

@@ -60,13 +60,16 @@ export class QuizSession {
 
     getCurrentQuestion() { return this.questions[this.currentIndex]; }
 
-    submitAnswer(selectedIndices) {
+    submitAnswer(selectedIndices, isGuessed = false) { 
         const q = this.getCurrentQuestion();
         const isCorrect = selectedIndices.length === q.correct.length && 
                           selectedIndices.every(idx => q.correct.includes(idx));
 
         if (isCorrect) this.score++;
-        this.history.push({ question: q, userSelected: selectedIndices, isCorrect: isCorrect });
+        
+        // ZWRÓĆ UWAGĘ NA KOŃCÓWKĘ TEJ LINIJKI:
+        this.history.push({ question: q, userSelected: selectedIndices, isCorrect: isCorrect, isGuessed: isGuessed }); 
+        
         return isCorrect;
     }
 
