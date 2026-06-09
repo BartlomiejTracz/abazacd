@@ -31,10 +31,10 @@ export const View = {
         return `
         <div class="card card-home" onclick="window.app.openSubject('${subject.id}')">
             <div style="display:flex; justify-content:space-between; align-items:flex-start">
-                <h3 style="flex:1">${safeName}</h3>
+                <h3 style="flex:1; margin: 0 0 10px 0;">${safeName}</h3>
                 ${buttonsHtml}
             </div>
-            <p>Baza: ${totalQ} pytań | Opanowano: ${percent}%</p>
+            <p style="margin: 5px 0;">Baza: ${totalQ} pytań | Opanowano: ${percent}%</p>
             <div class="stats-bar"><div class="stats-fill" style="width: ${percent}%"></div></div>
         </div>`;
     },
@@ -75,12 +75,14 @@ export const View = {
         </div>`;
     },
 
-question(quizSession) {
+    question(quizSession) {
         const q = quizSession.getCurrentQuestion();
         const current = quizSession.currentIndex + 1;
         const total = quizSession.questions.length;
         const isExam = typeof quizSession.mode === 'number';
-        const scoreHtml = isExam ? '' : `<span>Punkty: ${quizSession.score}</span>`;
+        
+        // W trybie egzaminu w ogóle nie generujemy HTMLa dla punktów, by oszczędzić miejsce
+        const scoreHtml = isExam ? '' : `<div style="display:flex; justify-content:flex-end; margin-bottom:10px"><span>Punkty: ${quizSession.score}</span></div>`;
 
         let answersHtml = q.answers.map((ans, idx) => `
             <div class="answer-option" onclick="window.app.toggleSelection(${idx})">
@@ -90,30 +92,30 @@ question(quizSession) {
         `).join('');
 
         return `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
             <button class="theme-toggle-btn" style="position: static; margin: 0;" onclick="window.app.toggleTheme()">${window.app.getThemeIcon()}</button>
             <span style="font-weight: bold;">Pytanie ${current}/${total}</span>
             <button class="btn" style="background:#6c757d; padding:8px 12px; font-size:14px; width: auto; margin: 0;" onclick="window.app.goHome()">Wyjdź</button>
         </div>
-        <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
-            ${scoreHtml}
-        </div>
-        <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
-            ${scoreHtml}
-        </div>
-       <div class="card"><h3>${escapeHTML(q.text)}</h3></div>
+        
+        ${scoreHtml}
+        
+       <div class="card" style="padding: 15px; margin-bottom: 12px;">
+           <h3 style="margin: 0; font-size: 1.1em;">${escapeHTML(q.text)}</h3>
+       </div>
+       
         <div id="answers-container">${answersHtml}</div>
         
-        <div style="display:flex; align-items:center; margin-top: 15px; margin-bottom: 5px; padding: 12px; background: rgba(243, 156, 18, 0.1); border-radius: 8px; border: 1px dashed #f39c12;">
-            <input type="checkbox" id="guessed-check" style="transform: scale(1.5); margin-right: 15px; cursor: pointer; accent-color: #f39c12;">
-            <label for="guessed-check" style="cursor: pointer; font-weight: bold; color: #d68910;">Nie byłem pewny (Strzelałem 🎯)</label>
+        <div style="display:flex; align-items:center; margin-top: 10px; margin-bottom: 5px; padding: 10px; background: rgba(243, 156, 18, 0.1); border-radius: 8px; border: 1px dashed #f39c12;">
+            <input type="checkbox" id="guessed-check" style="transform: scale(1.5); margin-right: 12px; cursor: pointer; accent-color: #f39c12;">
+            <label for="guessed-check" style="cursor: pointer; font-weight: bold; color: #d68910; font-size: 0.9em;">Nie byłem pewny (Strzelałem 🎯)</label>
         </div>
 
-        <button id="submit-answer-btn" class="btn" style="background:#2ecc71; margin-top:20px" onclick="window.app.handleAnswer()" disabled>Zatwierdź odpowiedź</button>
+        <button id="submit-answer-btn" class="btn" style="background:#2ecc71; margin-top:15px; padding: 14px;" onclick="window.app.handleAnswer()" disabled>Zatwierdź odpowiedź</button>
         `;
     },
 
-results(quizSession) {
+    results(quizSession) {
         const total = quizSession.questions.length;
         const percent = Math.round((quizSession.score / total) * 100);
         
@@ -125,12 +127,10 @@ results(quizSession) {
             const resultClass = isCorrect ? 'result-correct-card' : 'result-wrong-card';
             const icon = isCorrect ? '✅' : '❌';
 
-            // Zmienna generująca plakietkę
             const guessedBadge = isGuessed 
                 ? `<span style="background: #f39c12; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 10px; vertical-align: middle;">🎯 Strzał</span>` 
                 : '';
 
-            // NOWE: Klasa pomocnicza do ukrywania/pokazywania tylko strzałów
             const guessedClass = isGuessed ? 'result-guessed-card' : 'result-not-guessed-card';
 
             const userAnsList = userSelected
@@ -150,7 +150,7 @@ results(quizSession) {
             resultsHtml += `
             <div class="card ${resultClass} ${guessedClass}" style="border-left: 5px solid ${borderColor}; position:relative;">
                 <div style="position:absolute; right:10px; top:10px; font-size:1.2em;">${icon}</div>
-                <p style="margin-right:25px"><strong>${index + 1}. ${escapeHTML(question.text)}</strong> ${guessedBadge}</p>
+                <p style="margin-right:25px; margin-top:0;"><strong>${index + 1}. ${escapeHTML(question.text)}</strong> ${guessedBadge}</p>
                 
                 <div style="margin-bottom: 10px;">
                     <p style="font-size:0.9em; opacity:0.8; margin-bottom: 2px;">Twoje odpowiedzi:</p>
@@ -164,7 +164,6 @@ results(quizSession) {
             </div>`;
         });
 
-        // AKTUALIZACJA: Reguły CSS dla obu filtrów
         const styleBlock = `
         <style>
             .hide-correct .result-correct-card { display: none; }
@@ -173,7 +172,7 @@ results(quizSession) {
 
         return `
         ${styleBlock}
-        <h1>Wynik: ${percent}%</h1>
+        <h1 style="margin-top: 0;">Wynik: ${percent}%</h1>
         <div class="card">
             Poprawne: ${quizSession.score} / ${total}
         </div>
