@@ -5,10 +5,11 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #eef2f5; /* Jasnoszary, przyjemny dla oka */
+    background-color: #eef2f5; 
     color: #333;
     margin: 0;
-    padding: 20px;
+    /* Dodany duży dolny padding (100px), żeby treści nie chowały się na telefonach */
+    padding: 20px 20px 100px 20px; 
     line-height: 1.6;
 }
 

@@ -75,7 +75,7 @@ export const View = {
         </div>`;
     },
 
-    question(quizSession) {
+question(quizSession) {
         const q = quizSession.getCurrentQuestion();
         const current = quizSession.currentIndex + 1;
         const total = quizSession.questions.length;
@@ -91,9 +91,12 @@ export const View = {
 
         return `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-            <button class="theme-toggle-btn" onclick="window.app.toggleTheme()">${window.app.getThemeIcon()}</button>
-            <span>Pytanie ${current}/${total}</span>
-            <button class="btn" style="background:#6c757d; padding:8px 12px; font-size:14px" onclick="window.app.goHome()">Wyjdź</button>
+            <button class="theme-toggle-btn" style="position: static; margin: 0;" onclick="window.app.toggleTheme()">${window.app.getThemeIcon()}</button>
+            <span style="font-weight: bold;">Pytanie ${current}/${total}</span>
+            <button class="btn" style="background:#6c757d; padding:8px 12px; font-size:14px; width: auto; margin: 0;" onclick="window.app.goHome()">Wyjdź</button>
+        </div>
+        <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
+            ${scoreHtml}
         </div>
         <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
             ${scoreHtml}
