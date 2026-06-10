@@ -34,8 +34,8 @@ export const View = {
         if (isCustom) {
             buttonsHtml = `
             <div style="display:flex; gap:5px;">
-                <button class="btn-icon btn-edit-home" onclick="event.stopPropagation(); window.app.editSubject('${subject.id}')">✎</button>
-                <button class="btn-icon btn-delete-home" onclick="event.stopPropagation(); window.app.deleteSubject('${subject.id}')">🗑</button>
+                <button class="btn-icon btn-edit-home" onclick="event.stopPropagation(); window.app.editSubject('${subject.id}')" aria-label="Edytuj"><span class="abaza-icon abaza-icon-edit"></span></button>
+                <button class="btn-icon btn-delete-home" onclick="event.stopPropagation(); window.app.deleteSubject('${subject.id}')" aria-label="Usuń"><span class="abaza-icon abaza-icon-trash"></span></button>
             </div>`;
         }
 
@@ -58,7 +58,7 @@ export const View = {
         return `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
             ${this.themeToggle()}
-            <button class="btn" style="background:#6c757d; margin: 0; width: auto; padding: 8px 20px;" onclick="window.app.goHome()">Wróć</button>
+            <button class="btn" style="background:#6c757d; margin: 0; width: auto; padding: 6px 16px; font-size: 14px;" onclick="window.app.goHome()">Wróć</button>
         </div>
         
         <h1 style="margin-bottom: 20px;">${safeName}</h1>
@@ -210,8 +210,9 @@ export const View = {
             ${resultsHtml}
         </div>
 
-        <div style="display:flex; gap:10px; margin-top:25px;">
-            <button class="btn" style="background:#17a2b8; flex:1" onclick="window.app.restartQuiz()">🔁 Powtórz (Restart)</button>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:25px;">
+            <button class="btn" style="background:#e67e22; flex:1" onclick="window.app.repeatWrong()">🔁 Powtórz tylko błędne</button>
+            <button class="btn" style="background:#17a2b8; flex:1" onclick="window.app.restartQuiz()">🔁 Powtórz wszystko (Restart)</button>
             <button class="btn" style="flex:1" onclick="window.app.goHome()">Menu Główne</button>
         </div>
         `;
@@ -279,40 +280,38 @@ export const View = {
     },
 
     studyList(subject) {
-    const listHtml = subject.questions.map((q, index) => {
-        const safeText = escapeHTML(q.text);
-        const answersHtml = q.answers.map((ans, aIdx) => {
-            const isCorrect = q.correct.includes(aIdx);
-            const style = isCorrect 
-                ? 'border: 1px solid #2ecc71; color:#2ecc71; font-weight:bold; background:rgba(46, 204, 113, 0.1); border-radius:4px; padding:4px 8px; margin-bottom: 5px; display:block;' 
-                : 'border: 1px solid transparent; color: inherit; opacity: 0.7; padding:4px 8px; margin-bottom: 5px; display:block;';
-            return `<div style="${style}"><span style="margin-right:8px">${isCorrect ? '✅' : '⚪'}</span> ${escapeHTML(ans)}</div>`;
+        const listHtml = subject.questions.map((q, index) => {
+            const safeText = escapeHTML(q.text);
+            const answersHtml = q.answers.map((ans, aIdx) => {
+                const isCorrect = q.correct.includes(aIdx);
+                const style = isCorrect 
+                    ? 'border: 1px solid #2ecc71; color:#2ecc71; font-weight:bold; background:rgba(46, 204, 113, 0.1); border-radius:4px; padding:4px 8px; margin-bottom: 5px; display:block;' 
+                    : 'border: 1px solid transparent; color: inherit; opacity: 0.7; padding:4px 8px; margin-bottom: 5px; display:block;';
+                return `<div style="${style}"><span style="margin-right:8px">${isCorrect ? '✅' : '⚪'}</span> ${escapeHTML(ans)}</div>`;
+            }).join('');
+
+            return `
+            <div class="card" style="border-left: 5px solid #2ecc71;">
+                <h3 style="margin-top:0; margin-bottom:10px; color:#3d8cd6; font-size: 0.9em; text-transform:uppercase; letter-spacing:1px;">Pytanie ${index + 1}</h3>
+                <p style="font-size:1.1em; font-weight:500; margin-bottom:15px; margin-top:0;">${safeText}</p>
+                <div style="border-top:1px solid #444; padding-top:10px; margin-top:10px;">${answersHtml}</div>
+            </div>`;
         }).join('');
 
         return `
-        <div class="card" style="border-left: 5px solid #2ecc71;">
-            <h3 style="margin-top:0; margin-bottom:10px; color:#3d8cd6; font-size: 0.9em; text-transform:uppercase; letter-spacing:1px;">Pytanie ${index + 1}</h3>
-            <p style="font-size:1.1em; font-weight:500; margin-bottom:15px; margin-top:0;">${safeText}</p>
-            <div style="border-top:1px solid #444; padding-top:10px; margin-top:10px;">${answersHtml}</div>
-        </div>`;
-    }).join('');
+        <div class="sticky-header">
+            ${this.themeToggle()}
+            <button class="btn back-btn-top" onclick="window.app.openSubject('${subject.id}')">Wróć</button>
+        </div>
 
-    return `
-    <div class="sticky-header" style="display:flex; justify-content:space-between; align-items:center;">
-        ${this.themeToggle()}
-        <button class="btn back-btn-top" style="background:#6c757d;" onclick="window.app.openSubject('${subject.id}')">
-    Wróć
-</button>
-    </div>
+        <div style="margin: 20px 0; padding-top: 10px;">
+            <h2 style="margin:0; font-size: 1.5em;">Przegląd Bazy</h2>
+            <p style="margin:5px 0; opacity:0.8;">${escapeHTML(subject.name)}</p>
+        </div>
 
-    <div style="margin: 20px 0; padding-top: 10px;">
-        <h2 style="margin:0; font-size: 1.5em;">Przegląd Bazy</h2>
-        <p style="margin:5px 0; opacity:0.8;">${escapeHTML(subject.name)}</p>
-    </div>
-
-    <div style="padding-bottom:50px">
-        ${listHtml}
-    </div>
-    `;
-}
+        <div style="padding-bottom:50px">
+            ${listHtml}
+        </div>
+        `;
+    }
 };

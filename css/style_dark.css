@@ -1,303 +1,288 @@
-/* css/style_dark.css */
+/* --- Obsługa piktogramów Abaza --- */
+.abaza-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+  text-indent: -9999px;
+  overflow: hidden;
+}
 
-/* 1. RESET I BAZA */
-* { box-sizing: border-box; }
+.abaza-icon-trash {
+  background-image: url('TrashCan_Abaza_Dark.png');
+}
+
+.abaza-icon-edit {
+  background-image: url('Pencil_Abaza_Dark.png');
+}
+/* ---------------------------------- */
+
+* {
+  box-sizing: border-box;
+}
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #121212; 
-    color: #e0e0e0;            
-    margin: 0;
-    padding: 20px 20px 100px 20px;
-    line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 15px 15px 80px 15px;
+  line-height: 1.5;
 }
+
 #app {
-    max-width: 600px;
-    margin: 0 auto;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-h1 { font-size: 24px; text-align: center; margin-bottom: 20px; color: #ffffff; }
-h3 { font-size: 18px; margin-top: 0; color: #b0b3b8; }
+h1 { font-size: 22px; text-align: center; margin-bottom: 15px; color: #ffffff; }
+h3 { font-size: 17px; margin-top: 0; color: #b0b3b8; }
 
-/* 2. KARTY */
+/* Karty */
 .card {
-    background: #1e1e1e;       /* Ciemnoszare karty */
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Mocniejszy cień dla kontrastu */
-    cursor: pointer;
-    transition: transform 0.2s;   
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
-.card p strong {
-    color: #ffffff;
-}
+.card:active { transform: none; }
+.card-home:active { transform: scale(0.98); }
 
-.card:active {
-    transform: none; /* Efekt wciśnięcia */
-}
-.card-home:active {
-    transform: scale(0.98);
-}
-
-/* 3. PRZYCISKI */
+/* Przyciski główne */
 .btn {
-    display: block;
-    width: 100%;
-    padding: 14px 16px;
-    margin: 8px 0;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: center;
-    background-color: #3d8cd6; /* Niebieski, ale trochę stonowany */
-    color: white;
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  margin: 6px 0;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #3d8cd6;
+  color: white;
 }
 .btn:hover { background-color: #2b6cb0; }
 
-/* 4. ODPOWIEDZI */
+/* Przyciski odpowiedzi */
 .btn-answer {
-    background-color: #2d2d2d; /* Ciemny przycisk odpowiedzi */
-    color: #e0e0e0;
-    border: 1px solid #444;
-    text-align: left;
-    font-weight: normal;
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  text-align: left;
+  font-weight: normal;
 }
-
 .btn-answer:active { background-color: #404040; }
 
-/* Kolory stanów - jaśniejsze dla kontrastu na ciemnym */
 .btn-correct {
-    background-color: #00b894 !important;
-    color: white !important;
-    border-color: #00b894 !important;
+  background-color: #00b894 !important;
+  color: white !important;
+  border-color: #00b894 !important;
 }
-
 .btn-wrong {
-    background-color: #d63031 !important;
-    color: white !important;
-    border-color: #d63031 !important;
+  background-color: #d63031 !important;
+  color: white !important;
+  border-color: #d63031 !important;
 }
-
 .btn:disabled {
-    opacity: 0.7;
-    cursor: default;
-    pointer-events: none;
+  opacity: 0.7;
+  cursor: default;
+  pointer-events: none;
 }
 
-/* 5. PASEK POSTĘPU */
+/* Pasek postępu */
 .stats-bar {
-    height: 8px;
-    background: #333; /* Ciemne tło paska */
-    border-radius: 4px;
-    margin-top: 10px;
-    overflow: hidden;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  margin-top: 10px;
+  overflow: hidden;
 }
-
 .stats-fill {
-    height: 100%;
-    background: #00b894;
-    transition: width 0.5s ease-in-out;
+  height: 100%;
+  background: #00b894;
+  transition: width 0.5s ease-in-out;
 }
 
-/* 6. INPUTY (Dla kreatora) */
+/* Pola formularzy */
 .input-field {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 5px;
-    background-color: #2d2d2d; /* Ciemne tło inputa */
-    border: 1px solid #555;
-    color: white;
-    border-radius: 5px;
-    font-size: 16px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #2d2d2d;
+  border: 1px solid #555;
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
 }
 .input-field::placeholder { color: #888; }
 
-/* Inne */
+/* Radio / checkboxy */
+input[type="radio"] { transform: scale(1.5); margin-right: 10px; }
+.quiz-check {
+  width: 20px;
+  height: 20px;
+  accent-color: #3d8cd6;
+  margin-right: 15px;
+  pointer-events: none;
+}
+
+/* Dodatkowe elementy interfejsu */
 div[style*="display:flex"] {
-    margin-bottom: 10px;
-    font-weight: bold;
-    color: #aaa;
-    font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #aaa;
+  font-size: 14px;
 }
 .card-home { position: relative; }
 .btn-home-delete {
-    background: #c0392b;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    width: 30px;
-    height: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 10px;
+  background: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
 }
-
 .btn-edit {
-    background: #f39c12;
-    color: #333;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
+  background: #f39c12;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
-
 .btn-delete {
-    background: #c0392b;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
+  background: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
-
 .correct-answer {
-    color: #00b894;
-    font-weight: bold;
+  color: #00b894;
+  font-weight: bold;
 }
 
-/* Toggle Switch dla motywu w strukturze układu */
+/* Przełącznik motywu */
 .theme-switch {
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-    position: relative;
-    flex-shrink: 0;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  position: relative;
+  flex-shrink: 0;
 }
 .theme-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #555; /* ciemniejsze tło nieaktywne na dark mode */
-    transition: .4s;
-    border-radius: 26px;
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #555;
+  transition: .4s;
+  border-radius: 26px;
 }
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
 }
-input:checked + .slider {
-    background-color: #6c757d; 
-}
-input:checked + .slider:before {
-    transform: translateX(24px);
-}
+input:checked + .slider { background-color: #6c757d; }
+input:checked + .slider:before { transform: translateX(24px); }
 
-/* Ikony edycji i usuwania */
+/* Ikony edycji/usuwania na kartach */
 .btn-icon {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }
-
 .btn-edit-home {
-    background-color: #f1c40f; /* Żółty dla edycji */
-    margin-right: 5px;
+  background-color: #f1c40f;
+  margin-right: 5px;
 }
-
 .btn-delete-home {
-    background-color: #e74c3c; /* Czerwony dla kosza */
+  background-color: #e74c3c;
 }
 
+/* Komponenty odpowiedzi w quizie */
 .answer-option {
-    background-color: #2d2d2d; /* Ciemne tło */
-    color: #e0e0e0;
-    border: 1px solid #444;
-    padding: 15px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+  background-color: #2d2d2d;
+  border: 1px solid #444;
+  padding: 15px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
 }
-
-.answer-option:hover {
-    background-color: #3d3d3d;
-}
-
 .answer-option.selected {
-    background-color: #1a3a5a; /* Ciemny niebieski */
-    border-color: #3d8cd6;
+  background-color: #1a3a5a;
+  border-color: #3d8cd6;
 }
-
 .answer-row {
-    background-color: transparent;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.quiz-check {
-    width: 20px;
-    height: 20px;
-    accent-color: #3d8cd6; /* Kolor zaznaczenia w ciemnym trybie */
-    pointer-events: none; /* Kliknięcie przechodzi do rodzica .answer-option */
-}
-
-/* W trybie ciemnym */
-body.dark-mode .answer-option {
-    background-color: #2d2d2d;
-    border-color: #444;
-}
-body.dark-mode .answer-option.selected {
-    background-color: #1a3a5a;
-    border-color: #3d8cd6;
-}
-
+/* Stopka */
 .app-footer {
-    max-width: 600px;
-    margin: 40px auto 20px auto; /* Odstęp od góry i dołu */
-    text-align: center;
-    border-top: 1px solid #ddd;  /* Delikatna linia oddzielająca */
-    padding-top: 20px;
-    color: #7f8c8d;              /* Szary, dyskretny kolor tekstu */
-    font-size: 14px;
+  max-width: 600px;
+  margin: 40px auto 20px auto;
+  text-align: center;
+  border-top: 1px solid #444;
+  padding-top: 20px;
+  color: #aaa;
+  font-size: 14px;
 }
+.app-footer p { margin: 5px 0; }
 
-.app-footer p {
-    margin: 5px 0;
-}
-
+/* Nagłówek lepki */
 .sticky-header {
-    position: -webkit-sticky; /* Wsparcie dla Safari */
-    position: sticky;
-    top: 0;
-    z-index: 2000;
-    background-color: #121212; /* Tło musi być identyczne jak body w dark mode */
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+  background-color: #121212;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
 }
-
-/* Styl przycisku powrotu wewnątrz nagłówka */
 .back-btn-top {
-    width: auto !important;
-    margin: 0 !important;
-    padding: 8px 20px !important;
-    font-size: 14px;
-    background-color: #3d8cd6; /* Niebieski z dark mode */
+  width: auto !important;
+  margin: 0 !important;
+  padding: 6px 16px !important;
+  font-size: 14px;
+  background-color: #6c757d !important;
+  color: white !important;
 }

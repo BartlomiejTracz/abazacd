@@ -4,7 +4,7 @@ import { View } from './view.js';
 
 const appContainer = document.getElementById('app');
 let currentSession = null; 
-let editingIndex = null; // ZMIENNA POMOCNICZA DO EDYCJI
+let editingIndex = null;
 
 let draftSubject = {
     name: "",
@@ -36,7 +36,7 @@ const Controller = {
     loadTheme: () => {
         let savedTheme = localStorage.getItem('app_theme');
         if (!savedTheme) {
-            savedTheme = 'dark'; // Wymuś ciemny jako domyślny
+            savedTheme = 'dark';
             localStorage.setItem('app_theme', 'dark');
         }
         const themeLink = document.getElementById('theme-style');
@@ -64,7 +64,7 @@ const Controller = {
     // --- KREATOR ---
     openCreator: () => {
         draftSubject = { name: "", questions: [], id: null };
-        editingIndex = null; // RESETUJEMY INDEX PRZY OTWARCIU KREATORA
+        editingIndex = null;
         appContainer.innerHTML = View.creator();
         Controller.initCreator();
     },
@@ -74,7 +74,7 @@ const Controller = {
         const subject = db.find(s => s.id === id);
         if (!subject) return;
         draftSubject = JSON.parse(JSON.stringify(subject));
-        editingIndex = null; // RESETUJEMY INDEX PRZY OTWARCIU EDYCJI BAZY
+        editingIndex = null;
         appContainer.innerHTML = View.creator();
         document.getElementById('new-subject-name').value = draftSubject.name;
         Controller.updateDraftList();
@@ -116,17 +116,14 @@ const Controller = {
             return;
         }
 
-        // Jeśli edytujemy, zachowaj stare ID, jeśli nowe - generuj, wspierając wstecznie stare formaty
         const qId = (editingIndex !== null && draftSubject.questions[editingIndex]?.id) ? draftSubject.questions[editingIndex].id : Date.now() + Math.random();
 
         const questionObj = { id: qId, text: qText, answers, correct };
 
         if (editingIndex !== null) {
-            // AKTUALIZACJA W MIEJSCU
             draftSubject.questions[editingIndex] = questionObj;
-            editingIndex = null; // Resetujemy po zapisie
+            editingIndex = null;
         } else {
-            // DODANIE NA KONIEC
             draftSubject.questions.push(questionObj);
         }
 
@@ -145,26 +142,22 @@ const Controller = {
 
     editDraftQuestion: (index) => {
         const q = draftSubject.questions[index];
-        editingIndex = index; // ZAPAMIĘTUJEMY KTÓRE PYTANIE EDYTUJEMY
+        editingIndex = index;
         
         document.getElementById('q-text').value = q.text;
         const answersWrap = document.getElementById('answers-wrap');
         answersWrap.innerHTML = '';
         q.answers.forEach((ans, i) => Controller.addAnswerField(ans, q.correct.includes(i)));
         
-        // NIE USUWAMY PYTANIA Z LISTY, TYLKO WCZYTUJEMY JE DO FORMULARZA
-        // Przewiń do góry, żeby użytkownik widział formularz
         document.querySelector('.card').scrollIntoView({behavior: 'smooth'});
     },
 
     deleteDraftQuestion: (index) => {
-        // Jeśli usuwamy pytanie, które akurat edytujemy, resetujemy edycję
         if (editingIndex === index) {
             editingIndex = null;
             document.getElementById('q-text').value = '';
             Controller.initCreator();
         } else if (editingIndex !== null && index < editingIndex) {
-            // Jeśli usuwamy pytanie powyżej edytowanego, przesuwamy indeks edycji
             editingIndex--;
         }
 
@@ -173,7 +166,6 @@ const Controller = {
     },
 
     saveDatabase: () => {
-        // Zabezpieczenie przed kliknięciem "Zapisz baze" zanim zapiszemy wpisywane właśnie pytanie
         const qText = document.getElementById('q-text')?.value.trim();
         if (qText) {
             const rows = Array.from(document.querySelectorAll('.answer-row'));
@@ -218,7 +210,7 @@ const Controller = {
                 }
                 draftSubject = { name: json.name, questions: json.questions, id: null };
                 document.getElementById('new-subject-name').value = json.name;
-                editingIndex = null; // Resetujemy index
+                editingIndex = null;
                 Controller.updateDraftList();
                 input.value = ''; 
                 alert(`Wczytano bazę: ${json.name}`);
@@ -288,10 +280,18 @@ const Controller = {
         Controller.renderCurrentQuestion();
     },
 
+    // NOWA METODA: uruchom quiz z własną listą pytań (np. tylko błędne)
+    startQuizWithQuestions: (subjectId, questions, mode) => {
+        const subject = getDatabase().find(s => s.id === subjectId);
+        if (!subject) return;
+        currentSession = new QuizSession(subjectId, subject.questions, mode, [], questions);
+        Controller.renderCurrentQuestion();
+    },
+
     renderCurrentQuestion: () => {
         appContainer.innerHTML = View.question(currentSession);
         Controller.renderMath();
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Align do góry na mobilce
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
     restartQuiz: () => {
@@ -300,6 +300,22 @@ const Controller = {
         currentSession.currentIndex = 0;
         currentSession.history = [];
         Controller.renderCurrentQuestion();
+    },
+
+    // NOWA METODA: powtórka tylko błędnych odpowiedzi
+    repeatWrong: () => {
+        if (!currentSession || !currentSession.history.length) {
+            alert("Brak sesji do powtórzenia.");
+            return;
+        }
+        const wrongEntries = currentSession.history.filter(entry => !entry.isCorrect);
+        if (wrongEntries.length === 0) {
+            alert("Wszystkie odpowiedzi były poprawne! Brak błędnych pytań do powtórki.");
+            return;
+        }
+        const wrongQuestions = wrongEntries.map(entry => entry.question);
+        // Uruchom nowy quiz w trybie interaktywnym (nauka) z tymi pytaniami
+        Controller.startQuizWithQuestions(currentSession.subjectId, wrongQuestions, 'all');
     },
 
     toggleSelection: (index) => {
@@ -323,12 +339,12 @@ const Controller = {
         if (list.classList.contains('hide-correct')) {
             list.classList.remove('hide-correct');
             btn.textContent = "Ukryj poprawne odpowiedzi";
-            btn.style.background = "#f1c40f"; // żółty
+            btn.style.background = "#f1c40f";
             btn.style.color = "#333";
         } else {
             list.classList.add('hide-correct');
             btn.textContent = "Pokaż wszystkie odpowiedzi";
-            btn.style.background = "#3498db"; // niebieski
+            btn.style.background = "#3498db";
             btn.style.color = "white";
         }
     },
@@ -352,11 +368,11 @@ const Controller = {
         if (list.classList.contains('show-only-guessed')) {
             list.classList.remove('show-only-guessed');
             btn.textContent = "Pokaż tylko strzały";
-            btn.style.background = "#e67e22"; // pomarańczowy
+            btn.style.background = "#e67e22";
         } else {
             list.classList.add('show-only-guessed');
             btn.textContent = "Pokaż wszystkie pytania";
-            btn.style.background = "#3498db"; // niebieski
+            btn.style.background = "#3498db";
         }
     },
 
@@ -372,21 +388,17 @@ const Controller = {
 
         submitBtn.disabled = true;
 
-        // ODCZYT ZE STRONY:
         const guessedCheck = document.getElementById('guessed-check');
         const isGuessed = guessedCheck ? guessedCheck.checked : false;
 
-        // TUTAJ MUSI BYĆ DODANE ", isGuessed":
         const isCorrect = currentSession.submitAnswer(selected, isGuessed);
         const q = currentSession.getCurrentQuestion();
 
-        // Nie dodajemy do opanowanych, jeśli był to strzał:
         if (isCorrect && !isGuessed) markAsMastered(currentSession.subjectId, q.id);
 
         const isExamMode = typeof currentSession.mode === 'number';
 
         if (isExamMode) {
-            // TRYB EGZAMINU: Szybkie przejście
             if (currentSession.next()) {
                 Controller.renderCurrentQuestion();
             } else {
@@ -395,7 +407,6 @@ const Controller = {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         } else {
-            // TRYB NAUKI: Kolory i opóźnienie
             submitBtn.style.opacity = "0.6";
             submitBtn.textContent = "Czekaj..."; 
 

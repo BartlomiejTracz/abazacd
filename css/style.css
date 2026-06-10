@@ -1,285 +1,288 @@
-/* 1. RESET I BAZA */
+/* --- Obsługa piktogramów Abaza (jasny motyw) --- */
+.abaza-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+  text-indent: -9999px;
+  overflow: hidden;
+}
+
+.abaza-icon-trash {
+  background-image: url('TrashCan_Abaza_White.png');
+}
+
+.abaza-icon-edit {
+  background-image: url('Pencil_Abaza_White.png');
+}
+/* ---------------------------------------------- */
+
 * {
-    box-sizing: border-box; /* Kluczowe: padding nie powiększa elementów */
+  box-sizing: border-box;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #eef2f5; 
-    color: #333;
-    margin: 0;
-    /* Zoptymalizowany podział dolny */
-    padding: 15px 15px 80px 15px; 
-    line-height: 1.5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #eef2f5;
+  color: #333;
+  margin: 0;
+  padding: 15px 15px 80px 15px;
+  line-height: 1.5;
 }
 
-/* 2. KONTENER APLIKACJI (Symulacja telefonu na PC) */
 #app {
-    max-width: 600px; /* Na PC nie będzie szersze niż tablet */
-    margin: 0 auto;   /* Wyśrodkowanie na ekranie */
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 h1 { font-size: 22px; text-align: center; margin-bottom: 15px; color: #2c3e50; }
 h3 { font-size: 17px; margin-top: 0; color: #34495e; }
 
-/* 3. KARTY (Pytania, Przedmioty) */
+/* Karty */
 .card {
-    background: #fff;
-    border-radius: 12px; /* Zaokrąglone rogi */
-    padding: 14px;
-    margin-bottom: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Delikatny cień */
-    cursor: pointer; /* Żeby na PC było widać, że klikalne */
-    transition: transform 0.2s; /* Lekka animacja przy dotyku */
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
-.card:active {
-    transform: none; /* Efekt wciśnięcia */
-}
-.card-home:active {
-    transform: scale(0.98);
-}
+.card:active { transform: none; }
+.card-home:active { transform: scale(0.98); }
 
-/* 4. PRZYCISKI (Duże pod palec!) */
+/* Przyciski główne */
 .btn {
-    display: block;
-    width: 100%;
-    padding: 12px 16px;       /* Zoptymalizowane pole dotyku */
-    margin: 6px 0;
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: center;
-    transition: background 0.2s;
-}
-
-/* Przycisk domyślny (Nawigacja) */
-.btn {
-    background-color: #3498db;
-    color: white;
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  margin: 6px 0;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #3498db;
+  color: white;
 }
 .btn:hover { background-color: #2980b9; }
 
-/* 5. ODPOWIEDZI (Specyficzny styl) */
+/* Przyciski odpowiedzi */
 .btn-answer {
-    background-color: #f8f9fa; /* Jasne tło */
-    color: #333;               /* Ciemny tekst */
-    border: 1px solid #ddd;
-    text-align: left;          /* Odpowiedzi czytamy od lewej */
-    font-weight: normal;
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-weight: normal;
 }
-
 .btn-answer:active { background-color: #e2e6ea; }
 
-/* Kolory stanów (Poprawna/Błędna) */
 .btn-correct {
-    background-color: #2ecc71 !important; /* Soczysta zieleń */
-    color: white !important;
-    border-color: #2ecc71 !important;
+  background-color: #2ecc71 !important;
+  color: white !important;
+  border-color: #2ecc71 !important;
 }
-
 .btn-wrong {
-    background-color: #e74c3c !important; /* Czerwień */
-    color: white !important;
-    border-color: #e74c3c !important;
+  background-color: #e74c3c !important;
+  color: white !important;
+  border-color: #e74c3c !important;
 }
-
-/* Wyłączenie klikania po zaznaczeniu */
 .btn:disabled {
-    opacity: 0.9;
-    cursor: default;
-    pointer-events: none;
+  opacity: 0.9;
+  cursor: default;
+  pointer-events: none;
 }
 
-/* 6. PASEK POSTĘPU */
+/* Pasek postępu */
 .stats-bar {
-    height: 8px;
-    background: #e9ecef;
-    border-radius: 4px;
-    margin-top: 10px;
-    overflow: hidden;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  margin-top: 10px;
+  overflow: hidden;
 }
-
 .stats-fill {
-    height: 100%;
-    background: #2ecc71;
-    transition: width 0.5s ease-in-out; /* Płynne ładowanie paska */
+  height: 100%;
+  background: #2ecc71;
+  transition: width 0.5s ease-in-out;
 }
 
-/* 7. POMOCNICZE */
-div[style*="display:flex"] {
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #7f8c8d;
-    font-size: 14px;
-}
-
+/* Pola formularzy */
 .input-field {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+  border-radius: 5px;
+  font-size: 16px;
 }
-input[type="radio"] {
-    transform: scale(1.5);
-    margin-right: 10px;
+.input-field::placeholder { color: #888; }
+
+/* Radio / checkboxy */
+input[type="radio"] { transform: scale(1.5); margin-right: 10px; }
+.quiz-check {
+  width: 20px;
+  height: 20px;
+  accent-color: #3498db;
+  margin-right: 15px;
+  pointer-events: none;
 }
 
-.card-home {
-    position: relative; /* Żeby można było pozycjonować przycisk */
+/* Dodatkowe elementy interfejsu */
+div[style*="display:flex"] {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #7f8c8d;
+  font-size: 14px;
 }
+.card-home { position: relative; }
 .btn-home-delete {
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    width: 30px;
-    height: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
 }
-
 .btn-edit {
-    background: #ffc107;
-    color: #333;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
+  background: #ffc107;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
-
 .btn-delete {
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
-
 .correct-answer {
-    color: green;
-    font-weight: bold;
+  color: green;
+  font-weight: bold;
 }
 
-/* Toggle Switch dla motywu w strukturze układu */
+/* Przełącznik motywu */
 .theme-switch {
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-    position: relative;
-    flex-shrink: 0;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  position: relative;
+  flex-shrink: 0;
 }
 .theme-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 26px;
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 26px;
 }
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
 }
-input:checked + .slider {
-    background-color: #6c757d; 
-}
-input:checked + .slider:before {
-    transform: translateX(24px);
-}
+input:checked + .slider { background-color: #6c757d; }
+input:checked + .slider:before { transform: translateX(24px); }
 
-/* Ikony edycji i usuwania */
+/* Ikony edycji/usuwania na kartach */
 .btn-icon {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }
-
 .btn-edit-home {
-    background-color: #f1c40f; /* Żółty dla edycji */
-    margin-right: 5px;
+  background-color: #f1c40f;
+  margin-right: 5px;
 }
-
 .btn-delete-home {
-    background-color: #e74c3c; /* Czerwony dla kosza */
+  background-color: #e74c3c;
 }
 
+/* Komponenty odpowiedzi w quizie */
 .answer-option {
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
 }
-
 .answer-option.selected {
-    background-color: #e3f2fd;
-    border-color: #2196f3;
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+.answer-row {
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.quiz-check {
-    transform: scale(1.5);
-    margin-right: 15px;
-    pointer-events: none; /* Klikamy w cały wiersz */
-}
-
+/* Stopka */
 .app-footer {
-    max-width: 600px;
-    margin: 40px auto 20px auto;
-    text-align: center;
-    border-top: 1px solid #333;  /* Ciemniejsza linia */
-    padding-top: 20px;
-    color: #666;                 /* Ciemniejszy szary tekst */
-    font-size: 14px;
+  max-width: 600px;
+  margin: 40px auto 20px auto;
+  text-align: center;
+  border-top: 1px solid #333;
+  padding-top: 20px;
+  color: #666;
+  font-size: 14px;
 }
+.app-footer p { margin: 5px 0; }
 
-.app-footer p {
-    margin: 5px 0;
-}
-
+/* Nagłówek lepki */
 .sticky-header {
-    position: sticky;
-    top: 0;
-    z-index: 2000;
-    background-color: #eef2f5; /* takie samo jak body background */
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+  background-color: #eef2f5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
 }
-
 .back-btn-top {
-    width: auto !important;
-    margin: 0 !important;
-    padding: 8px 20px !important;
-    font-size: 14px;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 6px 16px !important;
+  font-size: 14px;
+  background-color: #6c757d !important;
+  color: white !important;
 }
