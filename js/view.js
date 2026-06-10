@@ -11,6 +11,17 @@ function escapeHTML(str) {
 }
 
 export const View = {
+    themeToggle() {
+        const isDark = (localStorage.getItem('app_theme') || 'dark') === 'dark';
+        const checked = isDark ? 'checked' : '';
+        return `
+        <label class="theme-switch">
+            <input type="checkbox" onchange="window.app.toggleTheme()" ${checked}>
+            <span class="slider round"></span>
+        </label>
+        `;
+    },
+
     homeCard(subject) {
         const totalQ = subject.questions.length;
         const masteredCount = getMasteredIds(subject.id).length;
@@ -45,33 +56,37 @@ export const View = {
         const safeName = escapeHTML(subject.name);
 
         return `
-        <button class="btn" style="background:#6c757d" onclick="window.app.goHome()">← Wróć</button>
-        <h1>${safeName}</h1>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            ${this.themeToggle()}
+            <button class="btn" style="background:#6c757d; margin: 0; width: auto; padding: 8px 20px;" onclick="window.app.goHome()">Wróć</button>
+        </div>
         
-        <div class="card" style="border: 2px solid #f1c40f">
-            <h3 style="color:#f1c40f">📖 Przegląd Bazy</h3>
-            <p>Zobacz wszystkie pytania wraz z poprawnymi odpowiedziami bez rozwiązywania testu.</p>
-            <button class="btn" style="background:#f39c12; color:white;" onclick="window.app.openStudyReview('${subject.id}')">Pokaż listę pytań</button>
+        <h1 style="margin-bottom: 20px;">${safeName}</h1>
+        
+        <div class="card" style="border: 2px solid #f1c40f;">
+            <h3 style="color:#f1c40f; margin-bottom: 6px;">📖 Przegląd Bazy</h3>
+            <p style="margin: 0 0 12px 0; font-size: 14px; opacity: 0.8;">Przeglądaj wszystkie pytania z odpowiedziami bez trybu testowego.</p>
+            <button class="btn" style="background:#f39c12; color:white; margin: 0;" onclick="window.app.openStudyReview('${subject.id}')">Pokaż listę pytań</button>
         </div>
 
-        <div class="card" style="border: 2px solid #3498db">
-            <h3 style="color:#3498db">Tryb Egzaminu</h3>
-            <p>Losowe pytania z puli (Dostępnych: ${total})</p>
+        <div class="card" style="border: 2px solid #3498db;">
+            <h3 style="color:#3498db; margin-bottom: 6px;">Tryb Egzaminu</h3>
+            <p style="margin: 0 0 12px 0; font-size: 14px; opacity: 0.8;">Losowy zestaw pytań z puli (Dostępnych: ${total})</p>
             
-            <label style="display:block; margin-bottom:5px; font-weight:bold; color:#888">Ile pytań wylosować?</label>
-            <div style="display:flex; gap:10px; margin-bottom:15px">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 6px;">
+                <label style="font-size: 14px; font-weight: 500;">Liczba pytań do losowania:</label>
                 <input type="number" id="exam-count-input" class="input-field" 
                        value="${defaultCount}" min="1" max="${total}" 
-                       style="margin:0; text-align:center; font-weight:bold; font-size:18px">
+                       style="margin:0; width: 75px; text-align:center; font-weight:bold; font-size:16px; padding: 6px;">
             </div>
 
-            <button class="btn" style="background:#2980b9" onclick="window.app.startCustomExam('${subject.id}')">Start Egzaminu</button> 
+            <button class="btn" style="background:#2980b9; margin: 0;" onclick="window.app.startCustomExam('${subject.id}')">Start Egzaminu</button> 
         </div>
 
-        <div class="card" style="border: 2px solid #2ecc71">
-            <h3 style="color:#2ecc71">Tryb Nauki (Interaktywny)</h3>
-            <p>Przejdź przez całą bazę (${total} pytań) rozwiązując je po kolei.</p>
-            <button class="btn" style="background:#27ae60" onclick="window.app.startQuiz('${subject.id}', 'all')">Ucz się wszystkiego</button>
+        <div class="card" style="border: 2px solid #2ecc71;">
+            <h3 style="color:#2ecc71; margin-bottom: 6px;">Tryb Nauki (Interaktywny)</h3>
+            <p style="margin: 0 0 12px 0; font-size: 14px; opacity: 0.8;">Przejdź sekwencyjnie przez pełną bazę pytań krok po kroku.</p>
+            <button class="btn" style="background:#27ae60; margin: 0;" onclick="window.app.startQuiz('${subject.id}', 'all')">Ucz się wszystkiego</button>
         </div>`;
     },
 
@@ -81,7 +96,6 @@ export const View = {
         const total = quizSession.questions.length;
         const isExam = typeof quizSession.mode === 'number';
         
-        // W trybie egzaminu w ogóle nie generujemy HTMLa dla punktów, by oszczędzić miejsce
         const scoreHtml = isExam ? '' : `<div style="display:flex; justify-content:flex-end; margin-bottom:10px"><span>Punkty: ${quizSession.score}</span></div>`;
 
         let answersHtml = q.answers.map((ans, idx) => `
@@ -93,7 +107,9 @@ export const View = {
 
         return `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
-            <button class="theme-toggle-btn" style="position: static; margin: 0;" onclick="window.app.toggleTheme()">${window.app.getThemeIcon()}</button>
+            <div style="display: flex; align-items: center;">
+                ${this.themeToggle()}
+            </div>
             <span style="font-weight: bold;">Pytanie ${current}/${total}</span>
             <button class="btn" style="background:#6c757d; padding:8px 12px; font-size:14px; width: auto; margin: 0;" onclick="window.app.goHome()">Wyjdź</button>
         </div>
@@ -172,7 +188,11 @@ export const View = {
 
         return `
         ${styleBlock}
-        <h1 style="margin-top: 0;">Wynik: ${percent}%</h1>
+        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            ${this.themeToggle()}
+            <h1 style="margin: 0; flex: 1; text-align: left; margin-left: 15px;">Wynik: ${percent}%</h1>
+        </div>
+        
         <div class="card">
             Poprawne: ${quizSession.score} / ${total}
         </div>
@@ -199,8 +219,13 @@ export const View = {
 
     creator() {
         return `
-        <button class="btn" style="background:#6c757d" onclick="window.app.goHome()">← Anuluj</button>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            ${this.themeToggle()}
+            <button class="btn" style="background:#6c757d; margin: 0; width: auto; padding: 8px 20px;" onclick="window.app.goHome()">Anuluj</button>
+        </div>
+        
         <h1>Kreator Bazy</h1>
+        
         <div class="card">
             <label>Nazwa Przedmiotu:</label>
             <input type="text" id="new-subject-name" class="input-field" placeholder="np. Farmakologia">
@@ -220,7 +245,7 @@ export const View = {
             <div id="draft-list"></div>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom: 20px;">
-            <button class="btn" style="flex:1" onclick="window.app.saveDatabase()">💾 ZAPISZ</button>
+            <button class="btn" style="flex:1" onclick="window.app.saveDatabase()">💾 ZAPISZ BAZĘ</button>
             <button class="btn" style="background:#f1c40f; color:#333; flex:1" onclick="window.app.downloadJSON()">⬇ POBIERZ</button>
             <input type="file" id="draft-file-input" accept=".json" style="display:none" onchange="window.app.loadDraftFromFile(this)">
             <button class="btn" style="background:#17a2b8; flex:1" onclick="document.getElementById('draft-file-input').click()">📂 WCZYTAJ</button>
@@ -254,42 +279,40 @@ export const View = {
     },
 
     studyList(subject) {
-        const listHtml = subject.questions.map((q, index) => {
-            const safeText = escapeHTML(q.text);
-            const answersHtml = q.answers.map((ans, aIdx) => {
-                const isCorrect = q.correct.includes(aIdx);
-                const style = isCorrect 
-                    ? 'border: 1px solid #2ecc71; color:#2ecc71; font-weight:bold; background:rgba(46, 204, 113, 0.1); border-radius:4px; padding:4px 8px; margin-bottom: 5px; display:block;' 
-                    : 'border: 1px solid transparent; color: inherit; opacity: 0.7; padding:4px 8px; margin-bottom: 5px; display:block;';
-                return `<div style="${style}"><span style="margin-right:8px">${isCorrect ? '✅' : '⚪'}</span> ${escapeHTML(ans)}</div>`;
-            }).join('');
-
-            return `
-            <div class="card" style="border-left: 5px solid #2ecc71;">
-                <h3 style="margin-top:0; margin-bottom:10px; color:#3d8cd6; font-size: 0.9em; text-transform:uppercase; letter-spacing:1px;">Pytanie ${index + 1}</h3>
-                <p style="font-size:1.1em; font-weight:500; margin-bottom:15px; margin-top:0;">${safeText}</p>
-                <div style="border-top:1px solid #444; padding-top:10px; margin-top:10px;">${answersHtml}</div>
-            </div>`;
+    const listHtml = subject.questions.map((q, index) => {
+        const safeText = escapeHTML(q.text);
+        const answersHtml = q.answers.map((ans, aIdx) => {
+            const isCorrect = q.correct.includes(aIdx);
+            const style = isCorrect 
+                ? 'border: 1px solid #2ecc71; color:#2ecc71; font-weight:bold; background:rgba(46, 204, 113, 0.1); border-radius:4px; padding:4px 8px; margin-bottom: 5px; display:block;' 
+                : 'border: 1px solid transparent; color: inherit; opacity: 0.7; padding:4px 8px; margin-bottom: 5px; display:block;';
+            return `<div style="${style}"><span style="margin-right:8px">${isCorrect ? '✅' : '⚪'}</span> ${escapeHTML(ans)}</div>`;
         }).join('');
 
         return `
-        <div class="sticky-header">
-            <button class="btn back-btn-top" onclick="window.app.openSubject('${subject.id}')">
-                ← Wróć
-            </button>
-            <button class="theme-toggle-btn sticky-theme" onclick="window.app.toggleTheme()">
-                ${window.app.getThemeIcon()}
-            </button>
-        </div>
+        <div class="card" style="border-left: 5px solid #2ecc71;">
+            <h3 style="margin-top:0; margin-bottom:10px; color:#3d8cd6; font-size: 0.9em; text-transform:uppercase; letter-spacing:1px;">Pytanie ${index + 1}</h3>
+            <p style="font-size:1.1em; font-weight:500; margin-bottom:15px; margin-top:0;">${safeText}</p>
+            <div style="border-top:1px solid #444; padding-top:10px; margin-top:10px;">${answersHtml}</div>
+        </div>`;
+    }).join('');
 
-        <div style="margin: 20px 0; padding-top: 10px;">
-            <h2 style="margin:0; font-size: 1.5em;">Przegląd Bazy</h2>
-            <p style="margin:5px 0; opacity:0.8;">${escapeHTML(subject.name)}</p>
-        </div>
+    return `
+    <div class="sticky-header" style="display:flex; justify-content:space-between; align-items:center;">
+        ${this.themeToggle()}
+        <button class="btn back-btn-top" style="background:#6c757d;" onclick="window.app.openSubject('${subject.id}')">
+    Wróć
+</button>
+    </div>
 
-        <div style="padding-bottom:50px">
-            ${listHtml}
-        </div>
-        `;
-    }
+    <div style="margin: 20px 0; padding-top: 10px;">
+        <h2 style="margin:0; font-size: 1.5em;">Przegląd Bazy</h2>
+        <p style="margin:5px 0; opacity:0.8;">${escapeHTML(subject.name)}</p>
+    </div>
+
+    <div style="padding-bottom:50px">
+        ${listHtml}
+    </div>
+    `;
+}
 };

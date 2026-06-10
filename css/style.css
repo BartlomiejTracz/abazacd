@@ -8,9 +8,9 @@ body {
     background-color: #eef2f5; 
     color: #333;
     margin: 0;
-    /* Dodany duży dolny padding (100px), żeby treści nie chowały się na telefonach */
-    padding: 20px 20px 100px 20px; 
-    line-height: 1.6;
+    /* Zoptymalizowany podział dolny */
+    padding: 15px 15px 80px 15px; 
+    line-height: 1.5;
 }
 
 /* 2. KONTENER APLIKACJI (Symulacja telefonu na PC) */
@@ -19,15 +19,15 @@ body {
     margin: 0 auto;   /* Wyśrodkowanie na ekranie */
 }
 
-h1 { font-size: 24px; text-align: center; margin-bottom: 20px; color: #2c3e50; }
-h3 { font-size: 18px; margin-top: 0; color: #34495e; }
+h1 { font-size: 22px; text-align: center; margin-bottom: 15px; color: #2c3e50; }
+h3 { font-size: 17px; margin-top: 0; color: #34495e; }
 
 /* 3. KARTY (Pytania, Przedmioty) */
 .card {
     background: #fff;
     border-radius: 12px; /* Zaokrąglone rogi */
-    padding: 20px;
-    margin-bottom: 15px;
+    padding: 14px;
+    margin-bottom: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Delikatny cień */
     cursor: pointer; /* Żeby na PC było widać, że klikalne */
     transition: transform 0.2s; /* Lekka animacja przy dotyku */
@@ -44,9 +44,9 @@ h3 { font-size: 18px; margin-top: 0; color: #34495e; }
 .btn {
     display: block;
     width: 100%;
-    padding: 16px;       /* Duże pole dotyku */
-    margin: 8px 0;
-    font-size: 16px;
+    padding: 12px 16px;       /* Zoptymalizowane pole dotyku */
+    margin: 6px 0;
+    font-size: 15px;
     font-weight: 600;
     border: none;
     border-radius: 8px;
@@ -109,9 +109,8 @@ h3 { font-size: 18px; margin-top: 0; color: #34495e; }
 }
 
 /* 7. POMOCNICZE */
-/* Nagłówek w trakcie quizu (licznik po lewej, punkty po prawej) */
 div[style*="display:flex"] {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-weight: bold;
     color: #7f8c8d;
     font-size: 14px;
@@ -168,22 +167,43 @@ input[type="radio"] {
     font-weight: bold;
 }
 
-.theme-toggle-btn {
+/* Toggle Switch dla motywu w strukturze układu */
+.theme-switch {
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    position: relative;
+    flex-shrink: 0;
+}
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    background: white;
-    border: 2px solid #ddd;
-    color: #333;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 20px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 26px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider {
+    background-color: #6c757d; 
+}
+input:checked + .slider:before {
+    transform: translateX(24px);
 }
 
 /* Ikony edycji i usuwania */
@@ -246,14 +266,12 @@ input[type="radio"] {
     margin: 5px 0;
 }
 
-/* style.css */
 .sticky-header {
     position: sticky;
     top: 0;
     z-index: 2000;
     background-color: #eef2f5; /* takie samo jak body background */
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -264,10 +282,4 @@ input[type="radio"] {
     margin: 0 !important;
     padding: 8px 20px !important;
     font-size: 14px;
-}
-
-/* Przycisk motywu wewnątrz przyklejonego nagłówka */
-.sticky-theme {
-    position: static !important; /* wyłączamy absolute, aby flexbox go ustawił */
-    margin: 0;
 }

@@ -20,28 +20,38 @@ const Controller = {
 
     // --- MOTYWY ---
     toggleTheme: () => {
-        const themeLink = document.getElementById('theme-style');
-        const currentTheme = themeLink.getAttribute('href');
-        let newTheme = currentTheme.includes('style.css') && !currentTheme.includes('dark') 
-            ? 'css/style_dark.css' : 'css/style.css';
+        const currentTheme = localStorage.getItem('app_theme') || 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
-        localStorage.setItem('app_theme', newTheme.includes('dark') ? 'dark' : 'light');
-        themeLink.setAttribute('href', newTheme);
-        const themeBtn = document.querySelector('.theme-toggle-btn');
-        if (themeBtn) themeBtn.textContent = Controller.getThemeIcon();
+        localStorage.setItem('app_theme', newTheme);
+        const themeLink = document.getElementById('theme-style');
+        themeLink.setAttribute('href', newTheme === 'dark' ? 'css/style_dark.css' : 'css/style.css');
+
+        // Aktualizuj wszystkie slidery na ekranie
+        document.querySelectorAll('.theme-switch input').forEach(input => {
+            input.checked = (newTheme === 'dark');
+        });
     },
 
     loadTheme: () => {
-        const savedTheme = localStorage.getItem('app_theme');
+        let savedTheme = localStorage.getItem('app_theme');
+        if (!savedTheme) {
+            savedTheme = 'dark'; // Wymuś ciemny jako domyślny
+            localStorage.setItem('app_theme', 'dark');
+        }
         const themeLink = document.getElementById('theme-style');
         themeLink.setAttribute('href', savedTheme === 'dark' ? 'css/style_dark.css' : 'css/style.css');
     },
 
-    getThemeIcon: () => localStorage.getItem('app_theme') === 'dark' ? '☀️' : '🌙',
-
     goHome: () => {
         const db = getDatabase();
-        let html = `<button class="theme-toggle-btn" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button><h1>Moje Quizy</h1>`;
+        
+        let html = `
+        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            ${View.themeToggle()}
+            <h1 style="flex: 1; margin: 0; text-align: center; padding-right: 50px;">Moje Quizy</h1>
+        </div>`;
+        
         html += `<button class="btn" style="background:#6f42c1; margin-bottom:20px" onclick="window.app.openCreator()">+ DODAJ WŁASNĄ BAZĘ</button>`;
         html += `<div style="display:flex; gap:10px; margin-bottom:20px">
              <input type="file" id="import-file" accept=".json" style="display:none" onchange="window.app.handleFileImport(this)">
@@ -55,7 +65,7 @@ const Controller = {
     openCreator: () => {
         draftSubject = { name: "", questions: [], id: null };
         editingIndex = null; // RESETUJEMY INDEX PRZY OTWARCIU KREATORA
-        appContainer.innerHTML = `<button class="theme-toggle-btn" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.creator();
+        appContainer.innerHTML = View.creator();
         Controller.initCreator();
     },
 
@@ -65,7 +75,7 @@ const Controller = {
         if (!subject) return;
         draftSubject = JSON.parse(JSON.stringify(subject));
         editingIndex = null; // RESETUJEMY INDEX PRZY OTWARCIU EDYCJI BAZY
-        appContainer.innerHTML = `<button class="theme-toggle-btn" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.creator();
+        appContainer.innerHTML = View.creator();
         document.getElementById('new-subject-name').value = draftSubject.name;
         Controller.updateDraftList();
         Controller.initCreator();
@@ -106,8 +116,8 @@ const Controller = {
             return;
         }
 
-        // Jeśli edytujemy, zachowaj stare ID, jeśli nowe - generuj
-        const qId = (editingIndex !== null) ? draftSubject.questions[editingIndex].id : Date.now();
+        // Jeśli edytujemy, zachowaj stare ID, jeśli nowe - generuj, wspierając wstecznie stare formaty
+        const qId = (editingIndex !== null && draftSubject.questions[editingIndex]?.id) ? draftSubject.questions[editingIndex].id : Date.now() + Math.random();
 
         const questionObj = { id: qId, text: qText, answers, correct };
 
@@ -163,6 +173,17 @@ const Controller = {
     },
 
     saveDatabase: () => {
+        // Zabezpieczenie przed kliknięciem "Zapisz baze" zanim zapiszemy wpisywane właśnie pytanie
+        const qText = document.getElementById('q-text')?.value.trim();
+        if (qText) {
+            const rows = Array.from(document.querySelectorAll('.answer-row'));
+            const answers = rows.map(r => r.querySelector('.answer-text').value.trim()).filter(v => v !== '');
+            const correct = rows.map((r, i) => r.querySelector('input[type="checkbox"]').checked ? i : null).filter(v => v !== null);
+            if (answers.length >= 2 && correct.length > 0) {
+                Controller.saveQuestionToDraft();
+            }
+        }
+
         const name = document.getElementById('new-subject-name').value;
         if(!name || draftSubject.questions.length === 0) return alert("Podaj nazwę i dodaj pytania!");
         draftSubject.name = name;
@@ -228,7 +249,7 @@ const Controller = {
 
     openSubject: (id) => {
         const subject = getDatabase().find(s => s.id === id);
-        if(subject) appContainer.innerHTML = `<button class="theme-toggle-btn" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.subjectDetails(subject);
+        if(subject) appContainer.innerHTML = View.subjectDetails(subject);
     },
 
     openStudyReview: (id) => {
@@ -270,6 +291,7 @@ const Controller = {
     renderCurrentQuestion: () => {
         appContainer.innerHTML = View.question(currentSession);
         Controller.renderMath();
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Align do góry na mobilce
     },
 
     restartQuiz: () => {
@@ -294,8 +316,7 @@ const Controller = {
         }
     },
 
-    // NOWA FUNKCJA DO OBSŁUGI PRZYCISKU WYNIKÓW
- toggleResultsView: () => {
+    toggleResultsView: () => {
         const list = document.getElementById('results-list');
         const btn = document.getElementById('toggle-results-btn');
         
@@ -339,7 +360,7 @@ const Controller = {
         }
     },
 
-handleAnswer: () => {
+    handleAnswer: () => {
         const submitBtn = document.getElementById('submit-answer-btn');
         if (!submitBtn || submitBtn.disabled) return;
 
@@ -369,8 +390,9 @@ handleAnswer: () => {
             if (currentSession.next()) {
                 Controller.renderCurrentQuestion();
             } else {
-                appContainer.innerHTML = `<button class="theme-toggle-btn" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.results(currentSession);
+                appContainer.innerHTML = View.results(currentSession);
                 Controller.renderMath();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         } else {
             // TRYB NAUKI: Kolory i opóźnienie
@@ -392,8 +414,9 @@ handleAnswer: () => {
                 if (currentSession.next()) {
                     Controller.renderCurrentQuestion();
                 } else {
-                    appContainer.innerHTML = `<button class="theme-toggle-btn" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.results(currentSession);
+                    appContainer.innerHTML = View.results(currentSession);
                     Controller.renderMath();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             }, 2000);
         }
