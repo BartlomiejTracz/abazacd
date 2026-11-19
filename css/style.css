@@ -1,288 +1,43 @@
-/* --- Obsługa piktogramów Abaza (jasny motyw) --- */
-.abaza-icon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  vertical-align: middle;
-  text-indent: -9999px;
-  overflow: hidden;
-}
+@import url("shared.css");
 
-.abaza-icon-trash {
-  background-image: url('TrashCan_Abaza_White.png');
-}
-
-.abaza-icon-edit {
-  background-image: url('Pencil_Abaza_White.png');
-}
-/* ---------------------------------------------- */
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #eef2f5;
-  color: #333;
-  margin: 0;
-  padding: 15px 15px 80px 15px;
-  line-height: 1.5;
-}
-
-#app {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-h1 { font-size: 22px; text-align: center; margin-bottom: 15px; color: #2c3e50; }
-h3 { font-size: 17px; margin-top: 0; color: #34495e; }
-
-/* Karty */
-.card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.card:active { transform: none; }
-.card-home:active { transform: scale(0.98); }
-
-/* Przyciski główne */
-.btn {
-  display: block;
-  width: 100%;
-  padding: 12px 16px;
-  margin: 6px 0;
-  font-size: 15px;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: center;
-  background-color: #3498db;
-  color: white;
-}
-.btn:hover { background-color: #2980b9; }
-
-/* Przyciski odpowiedzi */
-.btn-answer {
-  background-color: #f8f9fa;
-  color: #333;
-  border: 1px solid #ddd;
-  text-align: left;
-  font-weight: normal;
-}
-.btn-answer:active { background-color: #e2e6ea; }
-
-.btn-correct {
-  background-color: #2ecc71 !important;
-  color: white !important;
-  border-color: #2ecc71 !important;
-}
-.btn-wrong {
-  background-color: #e74c3c !important;
-  color: white !important;
-  border-color: #e74c3c !important;
-}
-.btn:disabled {
-  opacity: 0.9;
-  cursor: default;
-  pointer-events: none;
-}
-
-/* Pasek postępu */
-.stats-bar {
-  height: 8px;
-  background: #e9ecef;
-  border-radius: 4px;
-  margin-top: 10px;
-  overflow: hidden;
-}
-.stats-fill {
-  height: 100%;
-  background: #2ecc71;
-  transition: width 0.5s ease-in-out;
-}
-
-/* Pola formularzy */
-.input-field {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 5px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  color: #333;
-  border-radius: 5px;
-  font-size: 16px;
-}
-.input-field::placeholder { color: #888; }
-
-/* Radio / checkboxy */
-input[type="radio"] { transform: scale(1.5); margin-right: 10px; }
-.quiz-check {
-  width: 20px;
-  height: 20px;
-  accent-color: #3498db;
-  margin-right: 15px;
-  pointer-events: none;
-}
-
-/* Dodatkowe elementy interfejsu */
-div[style*="display:flex"] {
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #7f8c8d;
-  font-size: 14px;
-}
-.card-home { position: relative; }
-.btn-home-delete {
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 30px;
-  height: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-left: 10px;
-}
-.btn-edit {
-  background: #ffc107;
-  color: #333;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-.btn-delete {
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-.correct-answer {
-  color: green;
-  font-weight: bold;
-}
-
-/* Przełącznik motywu */
-.theme-switch {
-  display: inline-block;
-  width: 50px;
-  height: 26px;
-  position: relative;
-  flex-shrink: 0;
-}
-.theme-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-  border-radius: 26px;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-}
-input:checked + .slider { background-color: #6c757d; }
-input:checked + .slider:before { transform: translateX(24px); }
-
-/* Ikony edycji/usuwania na kartach */
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-.btn-edit-home {
-  background-color: #f1c40f;
-  margin-right: 5px;
-}
-.btn-delete-home {
-  background-color: #e74c3c;
-}
-
-/* Komponenty odpowiedzi w quizie */
-.answer-option {
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  padding: 15px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.answer-option.selected {
-  background-color: #e3f2fd;
-  border-color: #2196f3;
-}
-.answer-row {
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Stopka */
-.app-footer {
-  max-width: 600px;
-  margin: 40px auto 20px auto;
-  text-align: center;
-  border-top: 1px solid #333;
-  padding-top: 20px;
-  color: #666;
-  font-size: 14px;
-}
-.app-footer p { margin: 5px 0; }
-
-/* Nagłówek lepki */
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 2000;
-  background-color: #eef2f5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-.back-btn-top {
-  width: auto !important;
-  margin: 0 !important;
-  padding: 6px 16px !important;
-  font-size: 14px;
-  background-color: #6c757d !important;
-  color: white !important;
+/* Jasny motyw: istniejąca paleta z czytelniejszymi kontrastami. */
+:root {
+    color-scheme: light;
+    --page: #eef2f5;
+    --surface: #fff;
+    --surface-hover: #e8eef3;
+    --text: #263442;
+    --heading: #2c3e50;
+    --muted: #596773;
+    --line: #cdd5dd;
+    --control-border: #8797a4;
+    --primary: #2475ad;
+    --primary-hover: #1b608f;
+    --primary-text: #fff;
+    --selection: #e3f2fd;
+    --focus: #176da7;
+    --success: #237a49;
+    --success-hover: #1c633c;
+    --success-text: #21603c;
+    --success-soft: #e8f5ed;
+    --success-border: #27814e;
+    --danger-text: #9f3029;
+    --danger-soft: #fcecea;
+    --danger-border: #bc3e35;
+    --warning: #f1c40f;
+    --warning-hover: #e4b90d;
+    --warning-text: #493a0e;
+    --warning-soft: #fbf1d5;
+    --orange: #f3b76a;
+    --orange-hover: #e9a34d;
+    --purple: #6f42c1;
+    --purple-hover: #5d35a6;
+    --purple-text: #fff;
+    --teal: #177b8c;
+    --teal-hover: #116777;
+    --teal-text: #fff;
+    --import-soft: #dcece9;
+    --import-text: #195b50;
+    --disabled-bg: #dbe2e7;
+    --disabled-text: #596773;
 }

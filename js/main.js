@@ -4,7 +4,7 @@ import { View } from './view.js';
 
 const appContainer = document.getElementById('app');
 let currentSession = null; 
-let editingIndex = null;
+let editingIndex = null; // ZMIENNA POMOCNICZA DO EDYCJI
 
 let draftSubject = {
     name: "",
@@ -20,42 +20,32 @@ const Controller = {
 
     // --- MOTYWY ---
     toggleTheme: () => {
-        const currentTheme = localStorage.getItem('app_theme') || 'dark';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        localStorage.setItem('app_theme', newTheme);
         const themeLink = document.getElementById('theme-style');
-        themeLink.setAttribute('href', newTheme === 'dark' ? 'css/style_dark.css' : 'css/style.css');
-
-        // Aktualizuj wszystkie slidery na ekranie
-        document.querySelectorAll('.theme-switch input').forEach(input => {
-            input.checked = (newTheme === 'dark');
-        });
+        const currentTheme = themeLink.getAttribute('href');
+        let newTheme = currentTheme.includes('style.css') && !currentTheme.includes('dark') 
+            ? 'css/style_dark.css' : 'css/style.css';
+        
+        localStorage.setItem('app_theme', newTheme.includes('dark') ? 'dark' : 'light');
+        themeLink.setAttribute('href', newTheme);
+        const themeBtn = document.querySelector('.theme-toggle-btn');
+        if (themeBtn) themeBtn.textContent = Controller.getThemeIcon();
     },
 
     loadTheme: () => {
-        let savedTheme = localStorage.getItem('app_theme');
-        if (!savedTheme) {
-            savedTheme = 'dark';
-            localStorage.setItem('app_theme', 'dark');
-        }
+        const savedTheme = localStorage.getItem('app_theme');
         const themeLink = document.getElementById('theme-style');
         themeLink.setAttribute('href', savedTheme === 'dark' ? 'css/style_dark.css' : 'css/style.css');
     },
 
+    getThemeIcon: () => localStorage.getItem('app_theme') === 'dark' ? '☼' : '☾',
+
     goHome: () => {
         const db = getDatabase();
-        
-        let html = `
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-            ${View.themeToggle()}
-            <h1 style="flex: 1; margin: 0; text-align: center; padding-right: 50px;">Moje Quizy</h1>
-        </div>`;
-        
-        html += `<button class="btn" style="background:#6f42c1; margin-bottom:20px" onclick="window.app.openCreator()">+ DODAJ WŁASNĄ BAZĘ</button>`;
-        html += `<div style="display:flex; gap:10px; margin-bottom:20px">
+        let html = `<button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button><h1>Moje Quizy</h1>`;
+        html += `<button class="btn btn-create" onclick="window.app.openCreator()">+ Dodaj własną bazę</button>`;
+        html += `<div class="home-import">
              <input type="file" id="import-file" accept=".json" style="display:none" onchange="window.app.handleFileImport(this)">
-             <button class="btn" style="background:#20c997; flex:1" onclick="document.getElementById('import-file').click()">SZYBKI IMPORT</button>
+             <button class="btn btn-import" onclick="document.getElementById('import-file').click()">Szybki import</button>
         </div>`;
         html += db.map(s => View.homeCard(s)).join('');
         appContainer.innerHTML = html;
@@ -64,8 +54,8 @@ const Controller = {
     // --- KREATOR ---
     openCreator: () => {
         draftSubject = { name: "", questions: [], id: null };
-        editingIndex = null;
-        appContainer.innerHTML = View.creator();
+        editingIndex = null; // RESETUJEMY INDEX PRZY OTWARCIU KREATORA
+        appContainer.innerHTML = `<button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.creator();
         Controller.initCreator();
     },
 
@@ -74,8 +64,8 @@ const Controller = {
         const subject = db.find(s => s.id === id);
         if (!subject) return;
         draftSubject = JSON.parse(JSON.stringify(subject));
-        editingIndex = null;
-        appContainer.innerHTML = View.creator();
+        editingIndex = null; // RESETUJEMY INDEX PRZY OTWARCIU EDYCJI BAZY
+        appContainer.innerHTML = `<button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.creator();
         document.getElementById('new-subject-name').value = draftSubject.name;
         Controller.updateDraftList();
         Controller.initCreator();
@@ -116,14 +106,17 @@ const Controller = {
             return;
         }
 
-        const qId = (editingIndex !== null && draftSubject.questions[editingIndex]?.id) ? draftSubject.questions[editingIndex].id : Date.now() + Math.random();
+        // Jeśli edytujemy, zachowaj stare ID, jeśli nowe - generuj
+        const qId = (editingIndex !== null) ? draftSubject.questions[editingIndex].id : Date.now();
 
         const questionObj = { id: qId, text: qText, answers, correct };
 
         if (editingIndex !== null) {
+            // AKTUALIZACJA W MIEJSCU
             draftSubject.questions[editingIndex] = questionObj;
-            editingIndex = null;
+            editingIndex = null; // Resetujemy po zapisie
         } else {
+            // DODANIE NA KONIEC
             draftSubject.questions.push(questionObj);
         }
 
@@ -142,22 +135,26 @@ const Controller = {
 
     editDraftQuestion: (index) => {
         const q = draftSubject.questions[index];
-        editingIndex = index;
+        editingIndex = index; // ZAPAMIĘTUJEMY KTÓRE PYTANIE EDYTUJEMY
         
         document.getElementById('q-text').value = q.text;
         const answersWrap = document.getElementById('answers-wrap');
         answersWrap.innerHTML = '';
         q.answers.forEach((ans, i) => Controller.addAnswerField(ans, q.correct.includes(i)));
         
+        // NIE USUWAMY PYTANIA Z LISTY, TYLKO WCZYTUJEMY JE DO FORMULARZA
+        // Przewiń do góry, żeby użytkownik widział formularz
         document.querySelector('.card').scrollIntoView({behavior: 'smooth'});
     },
 
     deleteDraftQuestion: (index) => {
+        // Jeśli usuwamy pytanie, które akurat edytujemy, resetujemy edycję
         if (editingIndex === index) {
             editingIndex = null;
             document.getElementById('q-text').value = '';
             Controller.initCreator();
         } else if (editingIndex !== null && index < editingIndex) {
+            // Jeśli usuwamy pytanie powyżej edytowanego, przesuwamy indeks edycji
             editingIndex--;
         }
 
@@ -166,16 +163,6 @@ const Controller = {
     },
 
     saveDatabase: () => {
-        const qText = document.getElementById('q-text')?.value.trim();
-        if (qText) {
-            const rows = Array.from(document.querySelectorAll('.answer-row'));
-            const answers = rows.map(r => r.querySelector('.answer-text').value.trim()).filter(v => v !== '');
-            const correct = rows.map((r, i) => r.querySelector('input[type="checkbox"]').checked ? i : null).filter(v => v !== null);
-            if (answers.length >= 2 && correct.length > 0) {
-                Controller.saveQuestionToDraft();
-            }
-        }
-
         const name = document.getElementById('new-subject-name').value;
         if(!name || draftSubject.questions.length === 0) return alert("Podaj nazwę i dodaj pytania!");
         draftSubject.name = name;
@@ -210,7 +197,7 @@ const Controller = {
                 }
                 draftSubject = { name: json.name, questions: json.questions, id: null };
                 document.getElementById('new-subject-name').value = json.name;
-                editingIndex = null;
+                editingIndex = null; // Resetujemy index
                 Controller.updateDraftList();
                 input.value = ''; 
                 alert(`Wczytano bazę: ${json.name}`);
@@ -241,7 +228,7 @@ const Controller = {
 
     openSubject: (id) => {
         const subject = getDatabase().find(s => s.id === id);
-        if(subject) appContainer.innerHTML = View.subjectDetails(subject);
+        if(subject) appContainer.innerHTML = `<button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.subjectDetails(subject);
     },
 
     openStudyReview: (id) => {
@@ -280,18 +267,9 @@ const Controller = {
         Controller.renderCurrentQuestion();
     },
 
-    // NOWA METODA: uruchom quiz z własną listą pytań (np. tylko błędne)
-    startQuizWithQuestions: (subjectId, questions, mode) => {
-        const subject = getDatabase().find(s => s.id === subjectId);
-        if (!subject) return;
-        currentSession = new QuizSession(subjectId, subject.questions, mode, [], questions);
-        Controller.renderCurrentQuestion();
-    },
-
     renderCurrentQuestion: () => {
         appContainer.innerHTML = View.question(currentSession);
         Controller.renderMath();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
     restartQuiz: () => {
@@ -300,22 +278,6 @@ const Controller = {
         currentSession.currentIndex = 0;
         currentSession.history = [];
         Controller.renderCurrentQuestion();
-    },
-
-    // NOWA METODA: powtórka tylko błędnych odpowiedzi
-    repeatWrong: () => {
-        if (!currentSession || !currentSession.history.length) {
-            alert("Brak sesji do powtórzenia.");
-            return;
-        }
-        const wrongEntries = currentSession.history.filter(entry => !entry.isCorrect);
-        if (wrongEntries.length === 0) {
-            alert("Wszystkie odpowiedzi były poprawne! Brak błędnych pytań do powtórki.");
-            return;
-        }
-        const wrongQuestions = wrongEntries.map(entry => entry.question);
-        // Uruchom nowy quiz w trybie interaktywnym (nauka) z tymi pytaniami
-        Controller.startQuizWithQuestions(currentSession.subjectId, wrongQuestions, 'all');
     },
 
     toggleSelection: (index) => {
@@ -332,19 +294,20 @@ const Controller = {
         }
     },
 
-    toggleResultsView: () => {
+    // NOWA FUNKCJA DO OBSŁUGI PRZYCISKU WYNIKÓW
+ toggleResultsView: () => {
         const list = document.getElementById('results-list');
         const btn = document.getElementById('toggle-results-btn');
         
         if (list.classList.contains('hide-correct')) {
             list.classList.remove('hide-correct');
             btn.textContent = "Ukryj poprawne odpowiedzi";
-            btn.style.background = "#f1c40f";
+            btn.style.background = "#f1c40f"; // żółty
             btn.style.color = "#333";
         } else {
             list.classList.add('hide-correct');
             btn.textContent = "Pokaż wszystkie odpowiedzi";
-            btn.style.background = "#3498db";
+            btn.style.background = "#3498db"; // niebieski
             btn.style.color = "white";
         }
     },
@@ -368,15 +331,15 @@ const Controller = {
         if (list.classList.contains('show-only-guessed')) {
             list.classList.remove('show-only-guessed');
             btn.textContent = "Pokaż tylko strzały";
-            btn.style.background = "#e67e22";
+            btn.style.background = "#e67e22"; // pomarańczowy
         } else {
             list.classList.add('show-only-guessed');
             btn.textContent = "Pokaż wszystkie pytania";
-            btn.style.background = "#3498db";
+            btn.style.background = "#3498db"; // niebieski
         }
     },
 
-    handleAnswer: () => {
+handleAnswer: () => {
         const submitBtn = document.getElementById('submit-answer-btn');
         if (!submitBtn || submitBtn.disabled) return;
 
@@ -388,25 +351,29 @@ const Controller = {
 
         submitBtn.disabled = true;
 
+        // ODCZYT ZE STRONY:
         const guessedCheck = document.getElementById('guessed-check');
         const isGuessed = guessedCheck ? guessedCheck.checked : false;
 
+        // TUTAJ MUSI BYĆ DODANE ", isGuessed":
         const isCorrect = currentSession.submitAnswer(selected, isGuessed);
         const q = currentSession.getCurrentQuestion();
 
+        // Nie dodajemy do opanowanych, jeśli był to strzał:
         if (isCorrect && !isGuessed) markAsMastered(currentSession.subjectId, q.id);
 
         const isExamMode = typeof currentSession.mode === 'number';
 
         if (isExamMode) {
+            // TRYB EGZAMINU: Szybkie przejście
             if (currentSession.next()) {
                 Controller.renderCurrentQuestion();
             } else {
-                appContainer.innerHTML = View.results(currentSession);
+                appContainer.innerHTML = `<button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.results(currentSession);
                 Controller.renderMath();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         } else {
+            // TRYB NAUKI: Kolory i opóźnienie
             submitBtn.style.opacity = "0.6";
             submitBtn.textContent = "Czekaj..."; 
 
@@ -425,9 +392,8 @@ const Controller = {
                 if (currentSession.next()) {
                     Controller.renderCurrentQuestion();
                 } else {
-                    appContainer.innerHTML = View.results(currentSession);
+                    appContainer.innerHTML = `<button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${Controller.getThemeIcon()}</button>` + View.results(currentSession);
                     Controller.renderMath();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             }, 2000);
         }

@@ -1,288 +1,43 @@
-/* --- Obsługa piktogramów Abaza --- */
-.abaza-icon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  vertical-align: middle;
-  text-indent: -9999px;
-  overflow: hidden;
-}
+@import url("shared.css");
 
-.abaza-icon-trash {
-  background-image: url('TrashCan_Abaza_Dark.png');
-}
-
-.abaza-icon-edit {
-  background-image: url('Pencil_Abaza_Dark.png');
-}
-/* ---------------------------------- */
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #121212;
-  color: #e0e0e0;
-  margin: 0;
-  padding: 15px 15px 80px 15px;
-  line-height: 1.5;
-}
-
-#app {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-h1 { font-size: 22px; text-align: center; margin-bottom: 15px; color: #ffffff; }
-h3 { font-size: 17px; margin-top: 0; color: #b0b3b8; }
-
-/* Karty */
-.card {
-  background: #1e1e1e;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.card:active { transform: none; }
-.card-home:active { transform: scale(0.98); }
-
-/* Przyciski główne */
-.btn {
-  display: block;
-  width: 100%;
-  padding: 12px 16px;
-  margin: 6px 0;
-  font-size: 15px;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: center;
-  background-color: #3d8cd6;
-  color: white;
-}
-.btn:hover { background-color: #2b6cb0; }
-
-/* Przyciski odpowiedzi */
-.btn-answer {
-  background-color: #2d2d2d;
-  color: #e0e0e0;
-  border: 1px solid #444;
-  text-align: left;
-  font-weight: normal;
-}
-.btn-answer:active { background-color: #404040; }
-
-.btn-correct {
-  background-color: #00b894 !important;
-  color: white !important;
-  border-color: #00b894 !important;
-}
-.btn-wrong {
-  background-color: #d63031 !important;
-  color: white !important;
-  border-color: #d63031 !important;
-}
-.btn:disabled {
-  opacity: 0.7;
-  cursor: default;
-  pointer-events: none;
-}
-
-/* Pasek postępu */
-.stats-bar {
-  height: 8px;
-  background: #333;
-  border-radius: 4px;
-  margin-top: 10px;
-  overflow: hidden;
-}
-.stats-fill {
-  height: 100%;
-  background: #00b894;
-  transition: width 0.5s ease-in-out;
-}
-
-/* Pola formularzy */
-.input-field {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 5px;
-  background-color: #2d2d2d;
-  border: 1px solid #555;
-  color: white;
-  border-radius: 5px;
-  font-size: 16px;
-}
-.input-field::placeholder { color: #888; }
-
-/* Radio / checkboxy */
-input[type="radio"] { transform: scale(1.5); margin-right: 10px; }
-.quiz-check {
-  width: 20px;
-  height: 20px;
-  accent-color: #3d8cd6;
-  margin-right: 15px;
-  pointer-events: none;
-}
-
-/* Dodatkowe elementy interfejsu */
-div[style*="display:flex"] {
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #aaa;
-  font-size: 14px;
-}
-.card-home { position: relative; }
-.btn-home-delete {
-  background: #c0392b;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 30px;
-  height: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-left: 10px;
-}
-.btn-edit {
-  background: #f39c12;
-  color: #333;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-.btn-delete {
-  background: #c0392b;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-.correct-answer {
-  color: #00b894;
-  font-weight: bold;
-}
-
-/* Przełącznik motywu */
-.theme-switch {
-  display: inline-block;
-  width: 50px;
-  height: 26px;
-  position: relative;
-  flex-shrink: 0;
-}
-.theme-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #555;
-  transition: .4s;
-  border-radius: 26px;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-}
-input:checked + .slider { background-color: #6c757d; }
-input:checked + .slider:before { transform: translateX(24px); }
-
-/* Ikony edycji/usuwania na kartach */
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-.btn-edit-home {
-  background-color: #f1c40f;
-  margin-right: 5px;
-}
-.btn-delete-home {
-  background-color: #e74c3c;
-}
-
-/* Komponenty odpowiedzi w quizie */
-.answer-option {
-  background-color: #2d2d2d;
-  border: 1px solid #444;
-  padding: 15px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.answer-option.selected {
-  background-color: #1a3a5a;
-  border-color: #3d8cd6;
-}
-.answer-row {
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Stopka */
-.app-footer {
-  max-width: 600px;
-  margin: 40px auto 20px auto;
-  text-align: center;
-  border-top: 1px solid #444;
-  padding-top: 20px;
-  color: #aaa;
-  font-size: 14px;
-}
-.app-footer p { margin: 5px 0; }
-
-/* Nagłówek lepki */
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 2000;
-  background-color: #121212;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #333;
-}
-.back-btn-top {
-  width: auto !important;
-  margin: 0 !important;
-  padding: 6px 16px !important;
-  font-size: 14px;
-  background-color: #6c757d !important;
-  color: white !important;
+/* Te same komponenty i geometria; motyw zmienia wyłącznie tokeny kolorów. */
+:root {
+    color-scheme: dark;
+    --page: #121212;
+    --surface: #1e1e1e;
+    --surface-hover: #292e33;
+    --text: #e0e0e0;
+    --heading: #f3f5f7;
+    --muted: #aeb9c2;
+    --line: #3c454d;
+    --control-border: #6f7d88;
+    --primary: #3178b6;
+    --primary-hover: #286ba5;
+    --primary-text: #fff;
+    --selection: #1a3a5a;
+    --focus: #88c7f5;
+    --success: #176d57;
+    --success-hover: #125c49;
+    --success-text: #a1e5c6;
+    --success-soft: #173b31;
+    --success-border: #55c9a3;
+    --danger-text: #ffb4ac;
+    --danger-soft: #472728;
+    --danger-border: #eb827a;
+    --warning: #f1c40f;
+    --warning-hover: #dfb40d;
+    --warning-text: #f0ce79;
+    --warning-soft: #39311e;
+    --orange: #e8a453;
+    --orange-hover: #d99344;
+    --purple: #8155d2;
+    --purple-hover: #7045bc;
+    --purple-text: #fff;
+    --teal: #166e7d;
+    --teal-hover: #115c69;
+    --teal-text: #fff;
+    --import-soft: #193c35;
+    --import-text: #9adbc5;
+    --disabled-bg: #30363b;
+    --disabled-text: #aeb9c2;
 }
