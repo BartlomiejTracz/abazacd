@@ -46,7 +46,8 @@ const Controller = {
         html += `<div class="home-import">
              <input type="file" id="import-file" accept=".json" style="display:none" onchange="window.app.handleFileImport(this)">
              <button class="btn btn-import" onclick="document.getElementById('import-file').click()">Szybki import</button>
-        </div>`;
+        </div>
+        <div class="empty-state home-empty"><p>Nie masz jeszcze bazy pytań. Dodaj własną bazę lub zaimportuj plik JSON, korzystając z przycisków powyżej.</p></div>`;
         html += db.map(s => View.homeCard(s)).join('');
         appContainer.innerHTML = html;
     },

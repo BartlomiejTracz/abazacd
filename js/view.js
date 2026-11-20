@@ -31,7 +31,7 @@ export const View = {
         return `
         <div class="card card-home" onclick="window.app.openSubject('${subject.id}')">
             <div class="subject-heading">
-                <h3>${safeName}</h3>
+                <h3>${safeName}<span class="subject-open" aria-hidden="true">Otwórz →</span></h3>
                 ${buttonsHtml}
             </div>
             <p class="subject-meta">Baza: ${totalQ} pytań <span aria-hidden="true">·</span> Opanowano: ${percent}%</p>
@@ -91,24 +91,27 @@ export const View = {
 
         return `
         <div class="quiz-header">
-            <button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${window.app.getThemeIcon()}</button>
             <span>Pytanie ${current}/${total}</span>
             <button class="btn btn-back quiz-exit" onclick="window.app.goHome()">Wyjdź</button>
+            <button class="theme-toggle-btn" aria-label="Zmień motyw" title="Zmień motyw" onclick="window.app.toggleTheme()">${window.app.getThemeIcon()}</button>
         </div>
         <div class="quiz-score">
             ${scoreHtml}
         </div>
-       <div class="stats-bar quiz-progress" role="progressbar" aria-label="Postęp quizu" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${current}"><div class="stats-fill" style="width:${current / total * 100}%; --progress-from:${(current - 1) / total * 100}%"></div></div>
+       <div class="stats-bar quiz-progress" role="progressbar" aria-label="Pozycja w zestawie pytań" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${current}"><div class="stats-fill" style="width:${current / total * 100}%; --progress-from:${(current - 1) / total * 100}%"></div></div>
         <div class="question-stage">
-        <div class="question-heading"><h3>${escapeHTML(q.text)}</h3></div>
+        <div class="question-heading"><h1>${escapeHTML(q.text)}</h1></div>
+        <p class="answer-instruction">Odpowiedzi: ${q.answers.length} · zaznacz wszystkie poprawne</p>
         <div id="answers-container">${answersHtml}</div>
 
+        <div class="quiz-actions">
         <div class="guess-option">
             <input type="checkbox" id="guessed-check" >
             <label for="guessed-check">Nie byłem pewny</label>
         </div>
 
         <button id="submit-answer-btn" class="btn btn-success submit-answer" onclick="window.app.handleAnswer()" disabled>Zatwierdź odpowiedź</button>
+        </div>
         </div>
         `;
     },
@@ -189,10 +192,11 @@ results(quizSession) {
 
         <div id="results-list">
             ${resultsHtml}
+            <div class="empty-state results-empty" role="status"><p>Brak odpowiedzi pasujących do wybranych filtrów. Zmień filtry powyżej, aby zobaczyć pozostałe wyniki.</p></div>
         </div>
 
         <div class="action-row results-actions">
-            <button class="btn btn-teal" onclick="window.app.restartQuiz()">Powtórz (Restart)</button>
+            <button class="btn btn-secondary" onclick="window.app.restartQuiz()">Powtórz (Restart)</button>
             <button class="btn" onclick="window.app.goHome()">Menu Główne</button>
         </div>
         `;
@@ -202,29 +206,29 @@ results(quizSession) {
         return `
         <button class="btn btn-back" onclick="window.app.goHome()">← Anuluj</button>
         <h1>Kreator Bazy</h1>
-        <div class="card">
+        <div class="card creator-section">
             <label class="field-label" for="new-subject-name">Nazwa Przedmiotu:</label>
             <input type="text" id="new-subject-name" class="input-field" placeholder="np. Farmakologia">
         </div>
-        <div class="card mode-section mode-exam">
+        <div class="card creator-section">
             <h3>Edytor Pytania</h3>
             <label class="field-label" for="q-text">Treść pytania:</label>
             <input type="text" id="q-text" class="input-field" placeholder="Wpisz treść...">
             <label class="field-label">Odpowiedzi (zaznacz wszystkie poprawne):</label>
             <div id="answers-wrap"></div>
-            <button class="btn btn-teal" onclick="window.app.addAnswerField()">+ Dodaj kolejną odpowiedź</button>
+            <button class="btn btn-secondary" onclick="window.app.addAnswerField()">+ Dodaj kolejną odpowiedź</button>
             <hr>
             <button class="btn btn-success" onclick="window.app.saveQuestionToDraft()">Zatwierdź Pytanie</button>
         </div>
-        <div class="card">
+        <div class="card creator-section">
             <h3>Lista pytań (<span id="q-count">0</span>)</h3>
             <div id="draft-list"></div>
         </div>
         <div class="action-row creator-actions">
             <button class="btn" onclick="window.app.saveDatabase()">Zapisz</button>
-            <button class="btn btn-warning" onclick="window.app.downloadJSON()">Pobierz</button>
+            <button class="btn btn-secondary" onclick="window.app.downloadJSON()">Pobierz</button>
             <input type="file" id="draft-file-input" accept=".json" style="display:none" onchange="window.app.loadDraftFromFile(this)">
-            <button class="btn btn-teal" onclick="document.getElementById('draft-file-input').click()">Wczytaj</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('draft-file-input').click()">Wczytaj</button>
         </div>`;
     },
 
@@ -262,7 +266,7 @@ results(quizSession) {
                 const style = isCorrect
                     ? 'border-color:var(--success-border); color:var(--success-text); background:var(--success-soft); font-weight:600;'
                     : 'border-color:transparent; color:var(--muted);';
-                return `<div class="study-answer" style="${style}"><span class="study-mark" aria-hidden="true">${isCorrect ? '✓' : '·'}</span> ${escapeHTML(ans)}</div>`;
+                return `<div class="study-answer" style="${style}"><span class="study-mark" aria-hidden="true">${isCorrect ? '✓' : '·'}</span><span class="study-answer-text">${escapeHTML(ans)}</span></div>`;
             }).join('');
 
             return `
